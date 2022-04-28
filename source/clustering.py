@@ -38,9 +38,8 @@ def kmeans(data, k=None, centroids=None, steps=30):
     return clusters, centroids, elbow
 
 
-def create_clusters(df, lat_col, long_col, peso_col):
+def create_clusters(df, lat_col, long_col, peso_col, k):
     # Create Clusters
-    k = 5
     vals = df[[peso_col, lat_col, long_col]].values
 
     clusters, centroids, elbow = kmeans(vals, k)

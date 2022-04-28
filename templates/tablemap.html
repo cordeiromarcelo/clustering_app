@@ -1,0 +1,152 @@
+
+{% extends "base.html" %}
+{% block title %}Table{% endblock %}
+
+{% block head %}
+  {{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/table.css') }}">
+{% endblock %}
+
+{% block steps %}
+    <ul id="progressbar">
+        <li class="active" id="step1"><strong>Step 1</strong></li>
+        <li class="active" id="step2"><strong>Step 2</strong></li>
+        <li class="active" id="step3"><strong>Step 3</strong></li>
+        <li id="step4"><strong>Step 4</strong></li>
+    </ul>
+{% endblock %}
+
+{% block action %}
+    <p class="lead fw-normal">Observa as informações abaixo e a distribuição dos pontos no mapa para decidir a quantidade de clusters.</p>
+    <div class="card-body">
+        <form method="POST" action="" enctype="multipart/form-data">
+            <div class="row mb-3 justify-content-center">
+                <label for="clusters" class="form-label">Quantidade de Clusters (2-20)</label>
+                <div class="col-3">
+                    <input type="number" name="clusters" id="clusters" min="2" max="20" class="form-control" placeholder="Clusters">
+                </div>
+            </div>
+            <button type="submit" value="Submit" class="btn btn-primary mb-3 px-5">Enviar</button>
+        </form>
+    </div>
+{% endblock %}
+
+{% block content %}
+
+    <div class="container-fluid">
+
+        <div class="d-sm-flex align-items-center justify-content-between mb-4">
+            <h1 class="h3 mb-0 text-gray-800">Informações</h1>
+        </div>
+
+        <div class="row">
+            <div class="col-xl-4 col-md-6 mb-4">
+                <div class="card border-left-primary shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                    Linhas na Tabela</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{countRows}}</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-calendar fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-4 col-md-6 mb-4">
+                <div class="card border-left-primary shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                    Lat e Long Unicos</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{uniques}}</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-calendar fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-4 col-md-6 mb-4">
+                <div class="card border-left-warning shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                    Informações do Peso</div>
+                                <div class="mb-0">
+                                    {% for key, value in pesoInfo.items() %}
+                                        <a class="h5 font-weight-bold text-gray-800 me-2"> {{key}}: {{value}} </a>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-comments fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col">
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">Dados Importados</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive text-nowrap">
+                            <table class="table table-bordered table-hover">
+                                {% if len(row_data) == 10 %}
+                                <caption>Mostrando as primeiras 10 linhas</caption>
+                                {% endif %}
+                                <tr>
+                                    {% for col in column_names %}
+                                    <th>{{col}}</th>
+                                    {% endfor %}
+                                </tr>
+                                {% for row in row_data %}
+                                <tr>
+                                    {% for col, row_ in zip(column_names, row) %}
+                                    <td>{{row_}}</td>
+                                    {% endfor %}
+                                </tr>
+                                {% endfor %}
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">Distribuição dos dados</h6>
+                    </div>
+                    <div class="card-body">
+                        <div id='chart' class='chart'”></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block footer %}
+    {{ super() }}
+    <script type='text/javascript'>
+      var graphs = {{graphJSON | safe}};
+      Plotly.plot('chart',graphs,{});
+    </script>
+{% endblock %}
