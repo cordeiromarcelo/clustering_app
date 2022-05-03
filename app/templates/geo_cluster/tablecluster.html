@@ -3,8 +3,9 @@
 {% block title %}Table{% endblock %}
 
 {% block head %}
-  {{ super() }}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/table.css') }}">
+    {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/table.css') }}">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css" />
 {% endblock %}
 
 {% block steps %}
@@ -157,7 +158,7 @@
                         <h6 class="m-0 font-weight-bold text-primary">Distribuição dos dados</h6>
                     </div>
                     <div class="card-body">
-                        {{ svg_img|safe }}
+                        <div id="my-map"></div>
                     </div>
                 </div>
             </div>
@@ -174,5 +175,39 @@
 
       Plotly.plot('chart_cluster',graphs_cluster,{});
       Plotly.plot('chart_center',graphs_centers,{});
+    </script>
+    <script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js"></script>
+
+    <script>
+    window.onload = function () {
+        var data = {{geo_json | safe}};
+
+        var geojsonMarkerOptions = {
+            radius: 8,
+            fillColor: "#ff7800",
+            color: "#000",
+            weight: 1,
+            opacity: 1,
+            fillOpacity: 0.8
+        };
+
+        var basemap = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+        });
+
+        var geojson = L.geoJson(data, {
+              onEachFeature: function (feature, layer) {
+                layer.bindPopup(feature.properties.cluster);
+              }
+            });
+
+        var map = L.map('my-map')
+        .fitBounds(geojson.getBounds());
+    //    .setView([0.0,-10.0], 2);
+
+        basemap.addTo(map);
+        geojson.addTo(map);
+
+    };
     </script>
 {% endblock %}

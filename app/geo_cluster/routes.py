@@ -112,8 +112,8 @@ def renderTableClustered(filename):
 
     df_clustered_unique = df_clustered.drop_duplicates(['cluster_lat', 'cluster_lng'])
     fig_centers = px.scatter_mapbox(df_clustered_unique,
-                            lat=lat_col,
-                            lon=long_col,
+                            lat='cluster_lat',
+                            lon='cluster_lng',
                             zoom=3,
                             size=[30 for i in range(len(df_clustered_unique))],
                             size_max=30,
@@ -125,17 +125,29 @@ def renderTableClustered(filename):
 
     graphJSON_centers = json.dumps(fig_centers, cls=plotly.utils.PlotlyJSONEncoder)
 
-    fig, ax = plt.subplots(figsize=(14, 14))
-    ax.scatter(df_clustered[long_col], df_clustered[lat_col], c=df_clustered['cluster'],
-               s=df_clustered[peso_col] * 3)
-    ax.scatter(df_clustered_unique['cluster_lng'], df_clustered_unique['cluster_lat'], marker='x', color='red', s=200)
-    plt.title('Distribution Center Location ("x") and Cities ("O") sized by Delayed Orders')
+    json_result_string = df_clustered_unique.to_json(
+        orient='records',
+        double_precision=12,
+        date_format='iso'
+    )
+    json_result = json.loads(json_result_string)
 
-    img = io.StringIO()
-    fig.savefig(img, format='svg')
-    # clip off the xml headers from the image
-    svg_img = '<svg' + img.getvalue().split('<svg')[1]
+    geo_json = {
+        'type': 'FeatureCollection',
+        'features': []
+    }
+    for record in json_result:
+        geo_json['features'].append({
+            'type': 'Feature',
+            'geometry': {
+                'type': 'Point',
+                'coordinates': [record['cluster_lng'], record['cluster_lat']],
+            },
+            'properties': record,
+        })
+
+    #geo_json = json.dumps(geo_json, indent=2)
 
     return render_template("geo_cluster/tablecluster.html", column_names=df.columns.values, row_data=list(df.values.tolist())[:10],
                            graphJSON_cluster=graphJSON_cluster, zip=zip, len=len, countRows=countRows, uniques=uniques,
-                           pesoInfo=pesoInfo, graphJSON_centers=graphJSON_centers, svg_img=svg_img)
+                           pesoInfo=pesoInfo, graphJSON_centers=graphJSON_centers, geo_json=geo_json)
