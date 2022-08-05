@@ -125,6 +125,7 @@ def renderTableClustered(filename):
 
     graphJSON_centers = json.dumps(fig_centers, cls=plotly.utils.PlotlyJSONEncoder)
 
+    # Converte Dataframe para Json
     json_result_string = df_clustered_unique.to_json(
         orient='records',
         double_precision=12,
@@ -132,6 +133,7 @@ def renderTableClustered(filename):
     )
     json_result = json.loads(json_result_string)
 
+    # Transforma em geojson
     geo_json = {
         'type': 'FeatureCollection',
         'features': []

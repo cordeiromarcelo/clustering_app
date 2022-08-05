@@ -17,13 +17,13 @@
 {% endblock %}
 
 {% block action %}
-    <p class="lead fw-normal">Observa as informações abaixo e a distribuição dos pontos no mapa para decidir a quantidade de clusters.</p>
+    <p class="lead fw-normal">Observa as informações abaixo e a distribuição dos pontos no mapa para decidir a quantidade de centros de distribuição.</p>
     <div class="card-body">
         <form method="POST" action="" enctype="multipart/form-data">
             <div class="row mb-3 justify-content-center">
-                <label for="clusters" class="form-label">Quantidade de Clusters (2-20)</label>
+                <label for="clusters" class="form-label">Centros de Distribuição (2-20)</label>
                 <div class="col-3">
-                    <input type="number" name="clusters" id="clusters" min="2" max="20" class="form-control" placeholder="Clusters">
+                    <input type="number" name="clusters" id="clusters" min="2" max="20" class="form-control" placeholder="Centros">
                 </div>
             </div>
             <button type="submit" value="Submit" class="btn btn-primary mb-3 px-5">Enviar</button>
